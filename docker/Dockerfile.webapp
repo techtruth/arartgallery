@@ -1,0 +1,11 @@
+FROM node:lts
+
+WORKDIR /container/app
+RUN chown -R node:node /container
+USER node
+COPY --chown=node:node ./webapp ./
+RUN whoami
+RUN ls -la 
+RUN npm install
+
+ENTRYPOINT ["/bin/bash", "-c", "npm run prod"]
