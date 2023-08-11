@@ -41,6 +41,7 @@ export default class editGallery extends React.Component {
   deleteEntry = (index) => {
     const updatedEntries = this.state.entries.filter((_, i) => i !== index);
     this.setState({ entries: updatedEntries });
+    console.log("LOL EHAT", updatedEntries);
   };
 
 
@@ -51,27 +52,30 @@ export default class editGallery extends React.Component {
 
   Gallery = (props) => {
       const { entries } = props;
-      return ( <div className="gallery">
-               { entries.map( (entry, index) => (
-                 <div key={ index } className="galleryEntry">
-                   <img src={ entry.imageData } />
-                   <div className="overlay">
-                     <div className="text">
-                       <span>Name: <input value={ entry.name } 
-                                          onChange={(e) => this.handleNameChange(index, e.target.value)} /></span>
-                       <span>Artist: <input value={ entry.artist } 
-                                          onChange={(e) => this.handleArtistChange(index, e.target.value)} /></span>
-                       <span>Appraisal: <input value={ entry.appraisal } 
-                                          onChange={(e) => this.handleAppraisalChange(index, e.target.value)} /></span>
-                     </div>
-                     <div className="buttons">
-                       <button onClick={() => this.saveEntry(index)} >Save</button>
-                       <button onClick={() => this.deleteEntry(index)} >Delete</button>
+      return <div className="gallery">
+               <button>Generate Augmented Files</button>
+               <div className="galleryEntries">
+                 { entries.map( (entry, index) => (
+                   <div key={ index } className="galleryEntry">
+                     <img src={ entry.imageData } />
+                     <div className="overlay">
+                       <div className="text">
+                         <span>Name: <input value={ entry.name } 
+                                            onChange={(e) => this.handleNameChange(index, e.target.value)} /></span>
+                         <span>Artist: <input value={ entry.artist } 
+                                            onChange={(e) => this.handleArtistChange(index, e.target.value)} /></span>
+                         <span>Appraisal: <input value={ entry.appraisal } 
+                                            onChange={(e) => this.handleAppraisalChange(index, e.target.value)} /></span>
+                       </div>
+                       <div className="buttons">
+                         <button onClick={() => this.saveEntry(index)} >Save</button>
+                         <button onClick={() => this.deleteEntry(index)} >Delete</button>
+                       </div>
                      </div>
                    </div>
-                 </div>
-               ) ) }
-             </div> ) 
+                 ) ) }
+               </div>
+             </div> 
   }
 
   render() {
