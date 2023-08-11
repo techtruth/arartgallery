@@ -1,4 +1,4 @@
 webapp/node_modules
 webapp/package-lock.json
 webapp/webpack/dist
-
+*.swp
