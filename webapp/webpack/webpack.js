@@ -65,7 +65,7 @@ const config = {
       },
       {
         test: /\.png$|\.jpg$|\.svg$/,
-        type: "asset",
+        type: "asset/inline",
       }
     ],
   },

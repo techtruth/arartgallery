@@ -19,6 +19,9 @@ if (!process.env.NODE_ENV === "production") {
 }
 
 //Express API Routes
+app.use(cors( { origin: '*',
+                methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+                credentials: true, }));
 app.use(json());
 app.use(text());
 app.use(express.urlencoded({ extended: true })); // support encoded bodies
@@ -32,6 +35,11 @@ app.use(
     index: "index.html",
   })
 );
+
+// Handles any requests that don't match the ones above
+app.get('*', (req,res) =>{
+    res.sendFile(path.join(__dirname, "../webpack/dist/index.html"));
+});
 
 // Error handler
 app.use((error, _req, res, next) => {
