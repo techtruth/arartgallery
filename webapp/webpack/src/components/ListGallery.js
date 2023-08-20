@@ -5,7 +5,7 @@ import { addGalleryEntry, removeGalleryEntry } from "../database/galleryEntry";
 
 //Show images in a gallery, and allow editing of the attributes.
 // Also provide a button to generate the AR.js mind files
-export default class editGallery extends React.Component {
+export default class listGallery extends React.Component {
   constructor() {
     super();
 
@@ -41,6 +41,7 @@ export default class editGallery extends React.Component {
   deleteEntry = (index) => {
     const updatedEntries = this.state.entries.filter((_, i) => i !== index);
     this.setState({ entries: updatedEntries });
+    console.log("LOL EHAT", updatedEntries);
   };
 
 

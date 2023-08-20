@@ -1,5 +1,6 @@
 body {
   background-color: #93cB56;
+  margin: 0px;
 }
 
   div .gallery .galleryEntries {
@@ -59,4 +60,10 @@ body {
     padding: 10px;
     display: flex;
     flex-direction: column;
+  }
+
+
+
+  div .viewGallery {
+    height: 100vh;
   }

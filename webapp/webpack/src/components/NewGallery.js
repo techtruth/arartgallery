@@ -41,6 +41,7 @@ export default class editGallery extends React.Component {
   deleteEntry = (index) => {
     const updatedEntries = this.state.entries.filter((_, i) => i !== index);
     this.setState({ entries: updatedEntries });
+    console.log("LOL EHAT", updatedEntries);
   };
 
 
