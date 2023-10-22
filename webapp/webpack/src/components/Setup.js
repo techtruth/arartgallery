@@ -13,7 +13,7 @@ export default class setup extends React.Component {
   }
 
   setupDemoGallery() {
-    addGallery("Demo", "Frank's Clothing Store", "123 Washington Way");
+    addGallery("Demo", "Frank's Clothing Store", "123 Washington Way", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII");
     addGalleryEntry("Demo", "Demo Artwork #1", "Demo Artist Paul", "10.00", testImage1);
     addGalleryEntry("Demo", "Demo Artwork #2", "Demo Artist Paul ", "100.00", testImage2);
     addGalleryEntry("Demo", "Demo Artwork #3", "Demo Artist Mark", "55.00", testImage1);

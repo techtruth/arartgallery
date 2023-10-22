@@ -66,6 +66,10 @@ const config = {
       {
         test: /\.png$|\.jpg$|\.svg$/,
         type: "asset/inline",
+      },
+      {
+        test: /\.mind$/,
+        type: "asset/resource",
       }
     ],
   },

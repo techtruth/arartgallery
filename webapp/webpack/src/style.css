@@ -3,26 +3,27 @@ body {
   margin: 0px;
 }
 
-  div .gallery .galleryEntries {
+/* List Gallery component */
+  div .listGallery .galleryEntries {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(22%, 1fr));
     gap: 20px;
     margin: 20px;
   }
 
-  div .gallery .galleryEntry {
+  div .listGallery .galleryEntry {
     position: relative;
     overflow: hidden;
     border: 1px solid black;
   }
 
-  div .gallery .galleryEntry img {
+  div .listGallery .galleryEntry img {
     max-width: 100%;
     height: auto;
     display: block;
   }
 
-  div .gallery .galleryEntry .overlay {
+  div .listGallery .galleryEntry .overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -37,13 +38,13 @@ body {
     opacity: 1;
   }
 
-  div .gallery .galleryEntry .buttons {
+  div .listGallery .galleryEntry .buttons {
     margin-top: 10px;
     display: flex;
     gap: 10px;
   }
 
-  div .gallery .galleryEntry button {
+  div .listGallery .galleryEntry button {
     padding: 8px 16px;
     background-color: #007bff;
     color: white;
@@ -52,7 +53,7 @@ body {
     cursor: pointer;
   }
 
-  div .gallery .galleryEntry .text {
+  div .listGallery .galleryEntry .text {
     color: white;
     background-color: rgba(0, 0, 0, 0.55);
     border: 1px solid white;
@@ -63,7 +64,91 @@ body {
   }
 
 
+/* New Gallery component */
+  div .newGallery .galleryEntry {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid black;
+  }
 
+  div .newGallery .galleryEntry img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  div .newGallery .galleryEntry .text {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 1px solid white;
+    text-align: center;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+
+/* Edit Gallery component */
+  div .editGallery .galleryEntries {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(22%, 1fr));
+    gap: 20px;
+    margin: 20px;
+  }
+
+  div .editGallery .galleryEntry {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid black;
+  }
+
+  div .editGallery .galleryEntry img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  div .editGallery .galleryEntry .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0);
+    color: white;
+    opacity: 1;
+  }
+
+  div .editGallery .galleryEntry .buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+
+  div .editGallery .galleryEntry button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  div .editGallery .galleryEntry .text {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 1px solid white;
+    text-align: center;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+/* View Gallery component */
   div .viewGallery {
     height: 100vh;
   }

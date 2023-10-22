@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { getGalleryEntries } from "../database/gallery";
 import { addGalleryEntry, removeGalleryEntry } from "../database/galleryEntry";
 //import { addGalleryEntryAttribute, removeGalleryEntryAttribute} from "../database/galleryEntryAttribute";
+import { Compiler } from 'mind-ar/dist/mindar-image.prod.js'
 
 //Show images in a gallery, and allow editing of the attributes.
 // Also provide a button to generate the AR.js mind files
@@ -11,7 +12,8 @@ export default class editGallery extends React.Component {
 
     this.state = {
       galleryName: "Demo",
-      entries: new Array()
+      entries: new Array(),
+      mindAR: undefined
     }
   }
 
@@ -35,7 +37,7 @@ export default class editGallery extends React.Component {
 
   saveEntry = (index) => {
     // Here you can save the updated entries to your backend or perform any other necessary actions.
-    console.log("Saving entries:", this.state.entries[index]);
+    console.log("Saving entries:", this.state.entries[index], this.state);
   };
 
   deleteEntry = (index) => {
@@ -44,6 +46,38 @@ export default class editGallery extends React.Component {
   };
 
 
+  generateMindARFile = async () => {
+      const compiler = new Compiler();
+
+      const loadImage = async (file) => {
+        const img = new Image();
+
+        return new Promise((resolve, reject) => {
+          let img = new Image()
+          img.crossOrigin = "Anonymous";
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = file;
+        })
+      }
+
+      const images = [];
+      for (let i = 0; i < this.state.entries.length; i++) {
+        images.push(await loadImage(this.state.entries[i].imageData));
+      }
+      const dataList = await compiler.compileImageTargets(images, (progress) => {
+        console.log("Progress: ", progress.toFixed(2));
+      });
+      const exportedBuffer = await compiler.exportData();
+      if(!exportedBuffer) {
+        alert("Failed to generate MindAR file... Try again!");
+        console.log("Failed to generate MindAR file... Try again!");
+      } else {
+        console.log("Successfully generated MindAR file");
+        this.setState({ mindAR: exportedBuffer });
+      }
+  };
+
   async componentDidMount() {
     let entries = await getGalleryEntries(this.state.galleryName)
     this.setState({ entries });
@@ -51,8 +85,8 @@ export default class editGallery extends React.Component {
 
   Gallery = (props) => {
       const { entries } = props;
-      return <div className="gallery">
-               <button>Generate Augmented Files</button>
+      return <div className="editGallery">
+               <button onClick={() => this.generateMindARFile()}>Generate Augmented Files</button>
                <div className="galleryEntries">
                  { entries.map( (entry, index) => (
                    <div key={ index } className="galleryEntry">
