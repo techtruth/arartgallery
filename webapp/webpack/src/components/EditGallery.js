@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { getGalleryEntries } from "../database/gallery";
+import { setGalleryMindFile, getGalleryEntries } from "../database/gallery";
 import { addGalleryEntry, updateGalleryEntry, removeGalleryEntry } from "../database/galleryEntry";
 //import { addGalleryEntryAttribute, removeGalleryEntryAttribute} from "../database/galleryEntryAttribute";
 import { Compiler } from 'mind-ar/dist/mindar-image.prod.js'
+import * as base64 from 'base64-js';
 
 //Show images in a gallery, and allow editing of the attributes.
 // Also provide a button to generate the AR.js mind files
@@ -135,8 +136,10 @@ export default class editGallery extends React.Component {
         alert("Failed to generate MindAR file... Try again!");
         console.log("Failed to generate MindAR file... Try again!");
       } else {
-        console.log("Successfully generated MindAR file");
-        this.setState({ mindAR: exportedBuffer });
+        const b64 = base64.fromByteArray(exportedBuffer);
+        console.log("Successfully generated MindAR file", b64);
+        this.setState({ mindAR: b64 });
+        setGalleryMindFile(this.state.galleryName, b64);
       }
   };
 

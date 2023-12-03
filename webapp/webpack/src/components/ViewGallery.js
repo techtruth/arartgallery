@@ -1,20 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import 'aframe';
 import 'mind-ar/dist/mindar-image-aframe.prod.js';
-import { getGalleryEntries } from '../database/gallery';
-import mindfile from '../../stage/targets.mind';
+import { getGalleryEntries, getGalleryByName } from '../database/gallery';
 
 const ViewGallery = () => {
   const sceneRef = useRef(null);
   const [galleryName] = useState('Demo');
-  const [galleryMind] = useState(mindfile);
+  const [galleryMind, setGalleryMind] = useState();
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
           const loadedEntries = await getGalleryEntries(galleryName);
+          const galleryInfo = await getGalleryByName(galleryName);
           setEntries(loadedEntries);
+          setGalleryMind(galleryInfo.mindFileURL);
           console.log("FETCHED ENTRIES!");
       } catch (error) {
         console.error('Error loading entries:', error);
@@ -33,6 +34,7 @@ const ViewGallery = () => {
 
   return (
     <div>
+      {entries && galleryMind && (
       <a-scene
         class="viewGallery"
         ref={sceneRef}
@@ -55,6 +57,7 @@ const ViewGallery = () => {
           </a-entity>
         ))}
       </a-scene>
+      )}
     </div>
   );
 };

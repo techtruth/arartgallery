@@ -1,9 +1,7 @@
-import { addDoc, deleteDoc, getDocs, query, where, collection } from "@firebase/firestore"
+import { addDoc, updateDoc, deleteDoc, getDocs, query, where, collection } from "@firebase/firestore"
 import { ref, uploadString, getDownloadURL } from "@firebase/storage"
 import { getGalleryEntryImage } from "./galleryEntry";
 import { firestore, storage } from "./firebase";
-
-
 
 export const getGalleryEntries = async (name) => {
     try {
@@ -64,6 +62,29 @@ export const getAllGalleries = async () => {
     }
 }
 
+export const getGalleryByName = async (galleryName) => {
+    try {
+        const galleryQuery = query(collection(firestore, 'gallery'), where('name', '==', galleryName));
+        const galleryQuerySnapshot = await getDocs(galleryQuery);
+
+        if (!galleryQuerySnapshot.empty) {
+            const doc = galleryQuerySnapshot.docs[0];
+            let data = doc.data();
+            let imageData = await getGalleryImage(doc.id);
+            data.imageData = imageData;
+    console.log("CALLED!", data);
+            return data;
+        } else {
+            console.log(`Gallery with name ${galleryName} not found.`);
+            return null; // Gallery not found
+        }
+    } catch (err) {
+        console.error(err);
+        return null; // Handle error appropriately
+    }
+};
+
+
 export const addGallery = async (name, locationName, locationAddress, imageData) => {
     let data = {
         name: name || "Unknown",
@@ -108,3 +129,36 @@ export const getGalleryImage = async (imageId) => {
         console.log(err)
     }
 }
+
+
+export const setGalleryMindFile = async (galleryName, newMindFile) => {
+    try {
+        // Query for the gallery document based on the name
+        const galleryQuery = query(collection(firestore, 'gallery'), where('name', '==', galleryName));
+        const galleryQuerySnapshot = await getDocs(galleryQuery);
+
+        // Check if the gallery with the given name exists
+        if (!galleryQuerySnapshot.empty) {
+            // Assuming there is only one gallery with the given name, get its reference
+            const galleryDocRef = galleryQuerySnapshot.docs[0].ref;
+
+            // Create a reference to the file in Firebase Storage
+            const storageRef = ref(storage, `gallery/${galleryName}/mindFile`);
+
+            // Upload the file to Firebase Storage
+            await uploadString(storageRef, newMindFile, 'base64', { contentType: 'application/octet-stream' });
+
+            // Get the download URL of the uploaded file
+            const downloadURL = await getDownloadURL(storageRef);
+
+            // Update the gallery document with the download URL of the file
+            await updateDoc(galleryDocRef, {
+                mindFileURL: downloadURL
+            });
+        } else {
+            console.log(`Gallery with name ${galleryName} not found.`);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+};
