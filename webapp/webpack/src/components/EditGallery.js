@@ -12,7 +12,7 @@ export default class editGallery extends React.Component {
     super();
 
     this.state = {
-      galleryName: "Demo",
+      galleryName: "James Gallery",
       entries: new Array(),
       mindAR: undefined,
       newEntry: {
@@ -145,7 +145,9 @@ export default class editGallery extends React.Component {
 
   async componentDidMount() {
     let entries = await getGalleryEntries(this.state.galleryName)
-    this.setState({ entries });
+    if(entries) {
+      this.setState({ entries });
+    }
   }
 
   Gallery = (props) => {
@@ -194,14 +196,10 @@ export default class editGallery extends React.Component {
 
   render() {
     const { galleryName, entries } = this.state;
-    if (entries.length) {
-      return <div> 
-             <h2>Edit { galleryName } Gallery Page</h2>
-             <this.Gallery entries={entries}/>
-             </div>
-    } else {
-      return <div><h2>No Entries in { galleryName } this gallery!</h2></div>
-    }
+    return (<div> 
+           <h2>Edit { galleryName } Gallery Page</h2>
+           <this.Gallery entries={entries}/>
+           </div>)
 
   }
 }

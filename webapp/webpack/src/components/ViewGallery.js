@@ -5,7 +5,7 @@ import { getGalleryEntries, getGalleryByName } from '../database/gallery';
 
 const ViewGallery = () => {
   const sceneRef = useRef(null);
-  const [galleryName] = useState('Demo');
+  const [galleryName] = useState('James Gallery');
   const [galleryMind, setGalleryMind] = useState();
   const [entries, setEntries] = useState([]);
 
@@ -16,6 +16,7 @@ const ViewGallery = () => {
           const galleryInfo = await getGalleryByName(galleryName);
           setEntries(loadedEntries);
           setGalleryMind(galleryInfo.mindFileURL);
+          //setGalleryMind(mindfile);
           console.log("FETCHED ENTRIES!");
       } catch (error) {
         console.error('Error loading entries:', error);
