@@ -1,4 +1,4 @@
-import { doc, query, where, addDoc, getDocs, deleteDoc, collection } from "@firebase/firestore"
+import { doc, getDoc, updateDoc, query, where, addDoc, getDocs, deleteDoc, collection } from "@firebase/firestore"
 import { ref, uploadString, getDownloadURL } from "@firebase/storage"
 import { firestore, storage } from "./firebase";
 
@@ -32,7 +32,32 @@ export const addGalleryEntry = async (galleryName, entryName, artistName, apprai
         console.log(err)
     }
 }
- 
+
+export const updateGalleryEntry = async (entryId, entryName, artistName, appraisalValue) => {
+  try {
+    console.log('Updating gallery entry with ID:', entryId);
+
+    // Directly get the gallery entry by document ID
+    const galleryEntryDoc = doc(collection(firestore, "galleryEntry"), entryId);
+    const galleryEntrySnapshot = await getDoc(galleryEntryDoc);
+
+    if (galleryEntrySnapshot.exists()) {
+      // Gallery entry exists, update only the provided values
+      await updateDoc(galleryEntryDoc, {
+        name: entryName || "Unknown",
+        artist: artistName || "Unknown",
+        appraisal: appraisalValue || "Unknown",
+      });
+      console.log('Gallery entry updated successfully!');
+    } else {
+      console.log("No such gallery entry with the provided document ID:", entryId);
+      return null; // Gallery entry not found
+    }
+  } catch (err) {
+    console.error('Error updating gallery entry:', err);
+  }
+};
+
 export const removeGalleryEntry = async (galleryName, entryName) => {
     try {
       const galleryQuery = query(collection(firestore, "gallery"), where('name', '==', galleryName));

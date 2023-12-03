@@ -23,6 +23,7 @@ export const getGalleryEntries = async (name) => {
               let data = doc.data();
               let imageData = await getGalleryEntryImage(doc.id);
               data.imageData = imageData;
+              data.id = doc.id;
               galleryEntries.push(data);
             };
             return galleryEntries;

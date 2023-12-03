@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { getGalleryEntries } from "../database/gallery";
-import { addGalleryEntry, removeGalleryEntry } from "../database/galleryEntry";
+import { addGalleryEntry, updateGalleryEntry, removeGalleryEntry } from "../database/galleryEntry";
 //import { addGalleryEntryAttribute, removeGalleryEntryAttribute} from "../database/galleryEntryAttribute";
 import { Compiler } from 'mind-ar/dist/mindar-image.prod.js'
 
@@ -13,7 +13,14 @@ export default class editGallery extends React.Component {
     this.state = {
       galleryName: "Demo",
       entries: new Array(),
-      mindAR: undefined
+      mindAR: undefined,
+      newEntry: {
+        name: "New Name",
+        gallery: "",
+        artist: "Artist Name",
+        appraisal: "0.00",
+        imageData: ""
+      }
     }
   }
 
@@ -34,9 +41,64 @@ export default class editGallery extends React.Component {
     updatedEntries[index].appraisal = newAppraisal;
     this.setState({ entries: updatedEntries });
   };
+  handleImageChange = (index, newImage) => {
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const imageData = event.target.result;
+      const updatedEntries = [...this.state.entries];
+      updatedEntries[index].imageData = imageData;
+      this.setState({ entries: updatedEntries });
+      console.log("LOL WHAT", index, updatedEntries[index], imageData);
+    };
+
+    reader.readAsDataURL(event.target.files[0]);
+  };
+
+
+
+  //Process the values changed for the new entry
+  handleNewEntryChange = (field, event) => {
+    if(event.target.files) {
+    // Use FileReader to read the file and handle it appropriately
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const imageData = event.target.result;
+      this.setState((prevState) => ({
+      newEntry: {
+        ...prevState.newEntry,
+        [field]: imageData,
+      },
+      }));
+    };
+
+    reader.readAsDataURL(event.target.files[0]);
+    } else {
+
+    this.setState((prevState) => ({
+      newEntry: {
+        ...prevState.newEntry,
+        [field]: event.target.value,
+      },
+    }));
+    }
+  };
+
+  addEntry = () => {
+    // Here you can save the updated entries to your backend or perform any other necessary actions.
+    addGalleryEntry(this.state.galleryName,
+                    this.state.newEntry.name,
+                    this.state.newEntry.artist,
+                    this.state.newEntry.appraisal,
+                    this.state.newEntry.imageData);
+    console.log("Adding entry:", );
+  };
 
   saveEntry = (index) => {
     // Here you can save the updated entries to your backend or perform any other necessary actions.
+    const entryData = this.state.entries[index];
+    updateGalleryEntry(entryData.id, entryData.name, entryData.artist, entryData.appraisal, entryData.imageData);
     console.log("Saving entries:", this.state.entries[index], this.state);
   };
 
@@ -99,6 +161,8 @@ export default class editGallery extends React.Component {
                                             onChange={(e) => this.handleArtistChange(index, e.target.value)} /></span>
                          <span>Appraisal: <input value={ entry.appraisal } 
                                             onChange={(e) => this.handleAppraisalChange(index, e.target.value)} /></span>
+                         <span>Image: <input type="file" 
+                                            onChange={(e) => this.handleImageChange(index, e)} /></span>
                        </div>
                        <div className="buttons">
                          <button onClick={() => this.saveEntry(index)} >Save</button>
@@ -107,8 +171,22 @@ export default class editGallery extends React.Component {
                      </div>
                    </div>
                  ) ) }
+        <div className="galleryEntry">
+          <img src={this.state.newEntry.imageData}/>
+                     <div className="overlay">
+                       <div className="text">
+          <span>Name: <input value={this.state.newEntry.name} onChange={(e) => this.handleNewEntryChange("name", e)} /></span>
+          <span>Artist: <input value={this.state.newEntry.artist} onChange={(e) => this.handleNewEntryChange("artist", e)} /></span>
+          <span>Appraisal: <input value={this.state.newEntry.appraisal} onChange={(e) => this.handleNewEntryChange("appraisal", e)} /></span>
+          <span>Image: <input type="file" onChange={(e) => this.handleNewEntryChange("imageData", e)} /></span>
+          </div>
+                       <div className="buttons">
+          <button onClick={this.addEntry}>New</button>
+                       </div>
+                     </div>
+        </div>
                </div>
-             </div> 
+             </div>
   }
 
   render() {
