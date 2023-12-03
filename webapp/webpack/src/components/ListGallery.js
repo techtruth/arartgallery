@@ -17,11 +17,19 @@ export default class listGallery extends React.Component {
     this.setState({ galleries });
   }
 
+  navToGallery(galleryName) {
+    // Set the new location
+    console.log("LOL CLICKED?")
+    window.location.href = '/gallery/'+galleryName; // Replace with your desired URL
+  };
+
+
   ListAllGalleries = (props) => {
       const { galleries } = props;
+      console.log("GLLAER", galleries);
       return <div className="listGallery">
                  { galleries.map( (gallery, index) => (
-                   <div key={ index } className="galleryEntry">
+                   <div key={ index } className="galleryEntry" onClick={() => this.navToGallery( gallery.name )}>
                      <img src={ gallery.imageData } />
                      <div className="overlay">
                        <div className="text">
