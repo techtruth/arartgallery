@@ -1,19 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import 'aframe';
 import 'mind-ar/dist/mindar-image-aframe.prod.js';
-import { getGalleryEntries, getGalleryByName } from '../database/gallery';
+import { getGalleryEntries, getGallery } from '../database/gallery';
+import { useParams } from 'react-router-dom';
+
+
 
 const ViewGallery = () => {
+  const { galleryId } = useParams();
   const sceneRef = useRef(null);
-  const [galleryName] = useState('James Gallery');
   const [galleryMind, setGalleryMind] = useState();
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-          const loadedEntries = await getGalleryEntries(galleryName);
-          const galleryInfo = await getGalleryByName(galleryName);
+          const loadedEntries = await getGalleryEntries(galleryId);
+          const galleryInfo = await getGallery(galleryId);
           setEntries(loadedEntries);
           setGalleryMind(galleryInfo.mindFileURL);
           //setGalleryMind(mindfile);

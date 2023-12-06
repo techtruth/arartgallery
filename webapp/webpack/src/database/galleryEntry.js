@@ -2,14 +2,13 @@ import { doc, getDoc, updateDoc, query, where, addDoc, getDocs, deleteDoc, colle
 import { ref, uploadString, getDownloadURL } from "@firebase/storage"
 import { firestore, storage } from "./firebase";
 
-export const addGalleryEntry = async (galleryName, entryName, artistName, appraisalValue, imageData) => {
+export const addGalleryEntry = async (galleryId, entryName, artistName, appraisalValue, imageData) => {
 
     try {
-      const q = query(collection(firestore, "gallery"), where('name', '==', galleryName));
-      const querySnapshot = await getDocs(q);
-      if (!querySnapshot.empty) {
+      const galleryDoc = doc(collection(firestore, "gallery"), galleryId);
+      const gallerySnapshot = await getDoc(galleryDoc);
+      if (gallerySnapshot.exists()) {
         // Assuming gallery names are unique, so there should be only one matching document
-        const galleryId = querySnapshot.docs[0].id;
 
         let data = {
           name: entryName || "Unknown",
@@ -19,7 +18,6 @@ export const addGalleryEntry = async (galleryName, entryName, artistName, apprai
         }
 
         const galleryEntryRef = await addDoc(collection(firestore, "galleryEntry"), data);
-    
         const imageRef = ref(storage, galleryEntryRef.id);
         await uploadString(imageRef, imageData, 'data_url'); 
 
@@ -33,26 +31,49 @@ export const addGalleryEntry = async (galleryName, entryName, artistName, apprai
     }
 }
 
-export const updateGalleryEntry = async (entryId, entryName, artistName, appraisalValue) => {
+export const updateGalleryEntry = async (entryId, entryName, artistName, appraisalValue, imageData) => {
   try {
-    console.log('Updating gallery entry with ID:', entryId);
 
-    // Directly get the gallery entry by document ID
     const galleryEntryDoc = doc(collection(firestore, "galleryEntry"), entryId);
     const galleryEntrySnapshot = await getDoc(galleryEntryDoc);
 
     if (galleryEntrySnapshot.exists()) {
-      // Gallery entry exists, update only the provided values
-      await updateDoc(galleryEntryDoc, {
-        name: entryName || "Unknown",
-        artist: artistName || "Unknown",
-        appraisal: appraisalValue || "Unknown",
-      });
+      const updatedFields = {};
+
+      // Conditionally update name if provided
+      if (entryName) {
+        updatedFields.name = entryName;
+      }
+
+      // Conditionally update artistName if provided
+      if (artistName) {
+        updatedFields.artist = artistName;
+      }
+
+      // Conditionally update appraisalValue if provided
+      if (appraisalValue) {
+        updatedFields.appraisal = appraisalValue;
+      }
+
+      // Update the image in Firebase storage only if imageData is provided
+      if (imageData.startsWith("data:")) {
+        const imageRef = ref(storage, entryId);
+        await uploadString(imageRef, imageData, 'data_url');
+        const imageUrl = await getDownloadURL(imageRef);
+        updatedFields.imageData = imageUrl;
+      }
+
+      // Update gallery entry with the new or existing values
+      await updateDoc(galleryEntryDoc, updatedFields);
+
       console.log('Gallery entry updated successfully!');
+      return galleryEntrySnapshot.data();
+
     } else {
       console.log("No such gallery entry with the provided document ID:", entryId);
       return null; // Gallery entry not found
     }
+
   } catch (err) {
     console.error('Error updating gallery entry:', err);
   }

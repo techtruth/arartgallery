@@ -1,43 +1,34 @@
-import { addDoc, updateDoc, deleteDoc, getDocs, query, where, collection } from "@firebase/firestore"
+import { doc, addDoc, updateDoc, deleteDoc, getDoc, getDocs, query, where, collection } from "@firebase/firestore"
 import { ref, uploadString, getDownloadURL } from "@firebase/storage"
 import { getGalleryEntryImage } from "./galleryEntry";
 import { firestore, storage } from "./firebase";
 
-export const getGalleryEntries = async (name) => {
-    try {
-        const galleryQuery = query(collection(firestore, "gallery"), where('name', '==', name));
-        const galleryQuerySnapshot = await getDocs(galleryQuery);
-        if (!galleryQuerySnapshot.empty) {
-          // Assuming gallery names are unique, so there should be only one matching document
-          const galleryId = galleryQuerySnapshot.docs[0].id;
-          
-          const entryQuery = query(collection(firestore, "galleryEntry"), 
-                                   where('gallery', '==', galleryId)); 
-          const entryQuerySnapshot = await getDocs(entryQuery);
-          let galleryEntries = new Array();
-          if (!entryQuerySnapshot.empty) {
-            for( let i =0; i < entryQuerySnapshot.docs.length; i++) {
-              const doc = entryQuerySnapshot.docs[i];
-              let data = doc.data();
-              let imageData = await getGalleryEntryImage(doc.id);
-              data.imageData = imageData;
-              data.id = doc.id;
-              galleryEntries.push(data);
-            };
-            return galleryEntries;
-          } else {
-            console.log("No such gallery entry!");
-            return null; // Gallery entry not found
-          }
-         
-        } else {
-          console.log("No such gallery!");
-          return null; // Gallery not found                                                                
-        }
-    } catch(err) {
-        console.log(err)
+export const getGalleryEntries = async (galleryId) => {
+  try {
+    const entryQuery = query(collection(firestore, "galleryEntry"), where('gallery', '==', galleryId));
+    const entryQuerySnapshot = await getDocs(entryQuery);
+
+    let galleryEntries = new Array();
+
+    if (!entryQuerySnapshot.empty) {
+      for (let i = 0; i < entryQuerySnapshot.docs.length; i++) {
+        const doc = entryQuerySnapshot.docs[i];
+        let data = doc.data();
+        let imageData = await getGalleryEntryImage(doc.id);
+        data.imageData = imageData;
+        data.id = doc.id;
+        galleryEntries.push(data);
+      }
+      return galleryEntries;
+    } else {
+      console.log("No gallery entries found for the given gallery ID!");
+      return null; // Gallery entries not found
     }
-}
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
 
 export const getAllGalleries = async () => {
     try {
@@ -50,6 +41,7 @@ export const getAllGalleries = async () => {
             let data = doc.data();
             let imageData = await getGalleryImage(doc.id);
             data.imageData = imageData;
+            data.id = doc.id;
             galleries.push(data);
           };
           return galleries;
@@ -62,28 +54,25 @@ export const getAllGalleries = async () => {
     }
 }
 
-export const getGalleryByName = async (galleryName) => {
-    try {
-        const galleryQuery = query(collection(firestore, 'gallery'), where('name', '==', galleryName));
-        const galleryQuerySnapshot = await getDocs(galleryQuery);
+export const getGallery = async (galleryId) => {
+  try {
+    const galleryEntryDoc = doc(collection(firestore, "gallery"), galleryId);
+    const galleryEntrySnapshot = await getDoc(galleryEntryDoc);
 
-        if (!galleryQuerySnapshot.empty) {
-            const doc = galleryQuerySnapshot.docs[0];
-            let data = doc.data();
-            let imageData = await getGalleryImage(doc.id);
-            data.imageData = imageData;
-    console.log("CALLED!", data);
-            return data;
-        } else {
-            console.log(`Gallery with name ${galleryName} not found.`);
-            return null; // Gallery not found
-        }
-    } catch (err) {
-        console.error(err);
-        return null; // Handle error appropriately
+    if (galleryEntrySnapshot.exists()) {
+      let data = galleryEntrySnapshot.data();
+      let imageData = await getGalleryEntryImage(galleryId);
+      data.imageData = imageData;
+      data.id = galleryId;
+      return data;
+    } else {
+      console.log("No such gallery entry!");
+      return null; // Gallery entry not found
     }
+  } catch (err) {
+    console.log(err);
+  }
 };
-
 
 export const addGallery = async (name, locationName, locationAddress, imageData) => {
     let data = {
@@ -130,20 +119,17 @@ export const getGalleryImage = async (imageId) => {
     }
 }
 
-
-export const setGalleryMindFile = async (galleryName, newMindFile) => {
+export const setGalleryMindFile = async (galleryID, newMindFile) => {
     try {
-        // Query for the gallery document based on the name
-        const galleryQuery = query(collection(firestore, 'gallery'), where('name', '==', galleryName));
-        const galleryQuerySnapshot = await getDocs(galleryQuery);
+        // Get a reference to the gallery document based on the ID
+        const galleryDocRef = doc(firestore, 'gallery', galleryID);
 
-        // Check if the gallery with the given name exists
-        if (!galleryQuerySnapshot.empty) {
-            // Assuming there is only one gallery with the given name, get its reference
-            const galleryDocRef = galleryQuerySnapshot.docs[0].ref;
+        // Check if the gallery with the given ID exists
+        const galleryDocSnapshot = await getDoc(galleryDocRef);
 
+        if (galleryDocSnapshot.exists()) {
             // Create a reference to the file in Firebase Storage
-            const storageRef = ref(storage, `gallery/${galleryName}/mindFile`);
+            const storageRef = ref(storage, `gallery/${galleryDocSnapshot.data().name}/mindFile`);
 
             // Upload the file to Firebase Storage
             await uploadString(storageRef, newMindFile, 'base64', { contentType: 'application/octet-stream' });
@@ -156,7 +142,7 @@ export const setGalleryMindFile = async (galleryName, newMindFile) => {
                 mindFileURL: downloadURL
             });
         } else {
-            console.log(`Gallery with name ${galleryName} not found.`);
+            console.log(`Gallery with ID ${galleryID} not found.`);
         }
     } catch (err) {
         console.error(err);

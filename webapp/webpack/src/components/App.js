@@ -14,8 +14,8 @@ const App = () => {
       <Routes>
           <Route path="/" element={<ListAllGallery />} />
           <Route path="/new" element={<NewGallery />} />
-          <Route path="/edit" element={<EditGallery />} />
-          <Route path="/gallery" element={<ViewGallery />} />
+          <Route path="/edit/:galleryId" element={<EditGallery />} />
+          <Route path="/gallery/:galleryId" element={<ViewGallery />} />
           <Route path="/setup" element={<Setup />} />
       </Routes>
     </BrowserRouter>
