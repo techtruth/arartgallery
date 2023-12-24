@@ -25,22 +25,26 @@ export default class listGallery extends React.Component {
 
 
   ListAllGalleries = (props) => {
-      const { galleries } = props;
-      console.log("GLLAER", galleries);
-      return <div className="listGallery">
-                 { galleries.map( (gallery, index) => (
-                   <div key={ index } className="galleryEntry" onClick={() => this.navToGallery( gallery.id )}>
-                     <img src={ gallery.imageData } />
-                     <div className="overlay">
-                       <div className="text">
-                         <span>Name: { gallery.name } </span>
-                         <span>Address: { gallery.locationAddress } </span>
-                         <span>Location: { gallery.locationName } </span>
-                       </div>
-                     </div>
-                   </div>
-                 ) ) }
+     const { galleries } = props;
+
+     return (<div className="listGallery">
+       <div className="galleryEntries">
+         {galleries.map((gallery, index) => (
+           <div key={ index } className="galleryEntry" onClick={() => this.navToGallery( gallery.id )}>
+             <img src={gallery.imageData} alt={`Gallery Entry ${index}`} />
+             <div className="overlay">
+               <div className="text">
+                 <span>Name: { gallery.name } </span>
+                 <span>Address: { gallery.locationAddress } </span>
+                 <span>Location: { gallery.locationName } </span>
+               </div>
+               <div className="buttons">
+               </div>
              </div>
+           </div>
+         ))}
+       </div>
+     </div>)
   }
 
   render() {
